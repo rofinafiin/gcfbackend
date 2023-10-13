@@ -3,11 +3,12 @@ package gcfbackend
 import (
 	"github.com/aiteung/atdb"
 	"go.mongodb.org/mongo-driver/mongo"
+	"os"
 )
 
 func GetConnectionMongo(MongoString, dbname string) *mongo.Database {
 	MongoInfo := atdb.DBInfo{
-		DBString: MongoString,
+		DBString: os.Getenv(MongoString),
 		DBName:   dbname,
 	}
 	conn := atdb.MongoConnect(MongoInfo)
