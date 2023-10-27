@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	pasproj "github.com/HRMonitorr/PasetoprojectBackend"
+	"github.com/petapedia/peda"
+	"github.com/whatsauth/watoken"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -16,7 +19,7 @@ func GCHandlerFunc(publickey, Mongostring, dbname, colname string, r *http.Reque
 		resp.Status = false
 		resp.Message = "Header Login Not Exist"
 	} else {
-		existing := IsExist(tokenlogin, publickey)
+		existing := IsExist(tokenlogin, os.Getenv(publickey))
 		if !existing {
 			resp.Status = false
 			resp.Message = "Kamu kayaknya belum punya akun"
@@ -42,7 +45,7 @@ func GCFPostCoordinate(Mongostring, Publickey, dbname, colname string, r *http.R
 		req.Status = strconv.Itoa(http.StatusNotFound)
 		req.Message = "Header Login Not Exist"
 	} else {
-		existing := IsExist(tokenlogin, Publickey)
+		existing := IsExist(tokenlogin, os.Getenv(Publickey))
 		if !existing {
 			req.Status = strconv.Itoa(http.StatusNotFound)
 			req.Message = "Kamu kayaknya belum punya akun"
@@ -73,7 +76,7 @@ func GCFUpdateName(publickey, Mongostring, dbname string, r *http.Request) strin
 		req.Status = strconv.Itoa(http.StatusNotFound)
 		req.Message = "Header Login Not Exist"
 	} else {
-		existing := IsExist(tokenlogin, publickey)
+		existing := IsExist(tokenlogin, os.Getenv(publickey))
 		if !existing {
 			req.Status = strconv.Itoa(http.StatusNotFound)
 			req.Message = "Kamu kayaknya belum punya akun"
@@ -105,7 +108,7 @@ func GCFDeleteLon(publickey, Mongostring, dbname string, r *http.Request) string
 		req.Status = strconv.Itoa(http.StatusNotFound)
 		req.Message = "Header Login Not Exist"
 	} else {
-		existing := IsExist(tokenlogin, publickey)
+		existing := IsExist(tokenlogin, os.Getenv(publickey))
 		if !existing {
 			req.Status = strconv.Itoa(http.StatusNotFound)
 			req.Message = "Kamu kayaknya belum punya akun"
@@ -152,4 +155,27 @@ func Register(Mongoenv, dbname string, r *http.Request) string {
 	}
 	response := pasproj.ReturnStringStruct(resp)
 	return response
+}
+
+func Login(Privatekey, MongoEnv, dbname, Colname string, r *http.Request) string {
+	var resp pasproj.Credential
+	mconn := pasproj.MongoCreateConnection(MongoEnv, dbname)
+	var datauser peda.User
+	err := json.NewDecoder(r.Body).Decode(&datauser)
+	if err != nil {
+		resp.Message = "error parsing application/json: " + err.Error()
+	} else {
+		if peda.IsPasswordValid(mconn, Colname, datauser) {
+			tokenstring, err := watoken.Encode(datauser.Username, os.Getenv(Privatekey))
+			if err != nil {
+				resp.Message = "Gagal Encode Token : " + err.Error()
+			} else {
+				resp.Message = "Selamat Datang"
+				resp.Token = tokenstring
+			}
+		} else {
+			resp.Message = "Password Salah"
+		}
+	}
+	return pasproj.ReturnStringStruct(resp)
 }

@@ -1,6 +1,8 @@
 module github.com/rofinafiin/gcfbackend
 
-go 1.21.0
+go 1.21.1
+
+toolchain go1.21.3
 
 require (
 	aidanwoods.dev/go-paseto v1.5.0 // indirect
@@ -14,6 +16,7 @@ require (
 	github.com/klauspost/compress v1.17.2 // indirect
 	github.com/microsoft/go-mssqldb v1.6.0 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
+	github.com/petapedia/peda v0.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/whatsauth/watoken v0.1.3 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
