@@ -170,6 +170,7 @@ func Login(Privatekey, MongoEnv, dbname, Colname string, r *http.Request) string
 			if err != nil {
 				resp.Message = "Gagal Encode Token : " + err.Error()
 			} else {
+				resp.Status = true
 				resp.Message = "Selamat Datang"
 				resp.Token = tokenstring
 			}
